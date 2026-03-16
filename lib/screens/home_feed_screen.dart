@@ -43,6 +43,17 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PostProvider>().loadPosts();
     });
+
+    /// Load next posts when user reaches 2 posts before the end
+    _scrollController.addListener(() {
+      final provider = context.read<PostProvider>();
+
+      if (!provider.isLoading &&
+          _scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 400) {
+        provider.loadPosts();
+      }
+    });
   }
 
   Future<void> refreshFeed() async {
@@ -119,10 +130,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
             ),
           ),
           if (showArrow)
-            const Icon(
-              Icons.keyboard_arrow_down,
-              color: Colors.white,
-            )
+            const Icon(Icons.keyboard_arrow_down, color: Colors.white),
         ],
       ),
     );
@@ -133,13 +141,13 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
     return Positioned(
       /// MOVED UP (was 80)
-      top: 60,
+      top: 0,
 
-      left: MediaQuery.of(context).size.width / 2 - 110,
+      left: MediaQuery.of(context).size.width / 2 - 90,
 
       child: Container(
         /// REDUCED SIZE
-        width: 220,
+        width: 160,
 
         padding: const EdgeInsets.symmetric(vertical: 6),
 
@@ -149,28 +157,40 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
           borderRadius: BorderRadius.circular(18),
 
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black54,
-              blurRadius: 12,
-            )
-          ],
+          boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 12)],
         ),
 
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              dense: true,
-              leading: const Icon(Icons.people_outline, color: Colors.white),
-              title: const Text("Following"),
+            GestureDetector(
               onTap: showComingSoon,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.people_outline, color: Colors.white, size: 28),
+                    SizedBox(width: 20),
+                    Text("Following", style: TextStyle(fontSize: 17)),
+                  ],
+                ),
+              ),
             ),
-            ListTile(
-              dense: true,
-              leading: const Icon(Icons.star_border, color: Colors.white),
-              title: const Text("Favorites"),
+
+            GestureDetector(
               onTap: showComingSoon,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.star_border, color: Colors.white, size: 28),
+                    SizedBox(width: 20),
+                    Text("Favorites", style: TextStyle(fontSize: 17)),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -183,114 +203,121 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     final provider = context.watch<PostProvider>();
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-
-        /// BIGGER PLUS ICON
-        leading: IconButton(
-          icon: const Icon(
-            Icons.add,
-            size: 32,
-          ),
-          onPressed: showComingSoon,
-        ),
-
-        centerTitle: true,
-        title: buildAppBarTitle(),
-
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.favorite_border,
-              size: 28,
-            ),
-            onPressed: showComingSoon,
-          ),
-        ],
-      ),
-
       body: Stack(
         children: [
           NotificationListener<ScrollNotification>(
             onNotification: handleScroll,
-            child: ListView.builder(
+            child: CustomScrollView(
               controller: _scrollController,
               physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
               ),
-              itemCount:
-                  provider.posts.length + 2 + (provider.isLoading ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return SizedBox(
-                    height: pullDistance,
-                    child: Center(
-                      child: pullDistance > 20
-                          ? Transform.rotate(
-                              angle: (pullDistance / maxPull) * 3.14 * 2,
-                              child: Opacity(
-                                opacity: (pullDistance / refreshTrigger)
-                                    .clamp(0.0, 1.0),
-                                child: const CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
+              slivers: [
+                /// APP BAR (HIDES ON SCROLL)
+                SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  elevation: 0,
+                  backgroundColor: Colors.black,
+
+                  leading: IconButton(
+                    icon: const Icon(Icons.add, size: 32),
+                    onPressed: showComingSoon,
+                  ),
+
+                  centerTitle: true,
+                  title: buildAppBarTitle(),
+
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.favorite_border, size: 28),
+                      onPressed: showComingSoon,
+                    ),
+                  ],
+                ),
+
+                /// POSTS LIST
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final provider = context.watch<PostProvider>();
+
+                      if (index == 0) {
+                        return SizedBox(
+                          height: pullDistance,
+                          child: Center(
+                            child: pullDistance > 20
+                                ? Transform.rotate(
+                                    angle: (pullDistance / maxPull) * 3.14 * 2,
+                                    child: Opacity(
+                                      opacity: (pullDistance / refreshTrigger)
+                                          .clamp(0.0, 1.0),
+                                      child: const CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox(),
+                          ),
+                        );
+                      }
+
+                      if (index == 1) {
+                        return SizedBox(
+                          height: 140,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: const [
+                              YourStoryWidget(
+                                imageUrl: "https://i.pravatar.cc/150?img=1",
                               ),
-                            )
-                          : const SizedBox(),
-                    ),
-                  );
-                }
+                              StoryCircleWidget(
+                                imageUrl: "https://i.pravatar.cc/150?img=2",
+                                username: "somuchamp",
+                              ),
+                              StoryCircleWidget(
+                                imageUrl: "https://i.pravatar.cc/150?img=3",
+                                username: "triggered",
+                              ),
+                              StoryCircleWidget(
+                                imageUrl: "https://i.pravatar.cc/150?img=5",
+                                username: "bra1nooo",
+                              ),
+                              StoryCircleWidget(
+                                imageUrl: "https://i.pravatar.cc/150?img=6",
+                                username: "alex",
+                              ),
+                            ],
+                          ),
+                        );
+                      }
 
-                if (index == 1) {
-                  return SizedBox(
-                    height: 140,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: const [
-                        YourStoryWidget(
-                          imageUrl: "https://i.pravatar.cc/150?img=1",
-                        ),
-                        StoryCircleWidget(
-                          imageUrl: "https://i.pravatar.cc/150?img=2",
-                          username: "somuchamp",
-                        ),
-                        StoryCircleWidget(
-                          imageUrl: "https://i.pravatar.cc/150?img=3",
-                          username: "triggered",
-                        ),
-                        StoryCircleWidget(
-                          imageUrl: "https://i.pravatar.cc/150?img=5",
-                          username: "bra1nooo",
-                        ),
-                        StoryCircleWidget(
-                          imageUrl: "https://i.pravatar.cc/150?img=6",
-                          username: "alex",
-                        ),
-                      ],
-                    ),
-                  );
-                }
+                      if (provider.isLoading &&
+                          index == provider.posts.length + 2) {
+                        return const PostShimmer();
+                      }
 
-                if (provider.isLoading &&
-                    index == provider.posts.length + 2) {
-                  return const PostShimmer();
-                }
+                      final post = provider.posts[index - 2];
 
-                final post = provider.posts[index - 2];
-
-                return PostWidget(
-                  username: post.username,
-                  profileImage: post.userAvatar,
-                  audioName: "Original Audio",
-                  images: post.images,
-                  aspectRatio: post.aspectRatio,
-                  caption: post.caption,
-                  likes: 120,
-                  timeAgo: "12 hours ago",
-                );
-              },
+                      return PostWidget(
+                        username: post.username,
+                        profileImage: post.userAvatar,
+                        audioName: "Original Audio",
+                        images: post.images,
+                        aspectRatio: post.aspectRatio,
+                        caption: post.caption,
+                        likes: 120,
+                        timeAgo: "12 hours ago",
+                      );
+                    },
+                    childCount:
+                        context.watch<PostProvider>().posts.length +
+                        2 +
+                        (context.watch<PostProvider>().isLoading ? 1 : 0),
+                  ),
+                ),
+              ],
             ),
           ),
 

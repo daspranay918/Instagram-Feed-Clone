@@ -98,24 +98,17 @@ class _PostActionsState extends State<PostActions>
             ),
           ),
 
+           /// REPOST
           const SizedBox(width: 16),
-
-          /// REPOST
           GestureDetector(
-            onTap: () {
-              setState(() {
-                isReposted = !isReposted;
-              });
-            },
-            child: Icon(
+            onTap: () => showComingSoon(context),
+            child: const Icon(
               Icons.repeat,
-              color: isReposted ? Colors.green : Colors.white,
               size: 26,
             ),
           ),
 
           const SizedBox(width: 16),
-
           /// SHARE
           GestureDetector(
             onTap: () => showComingSoon(context),

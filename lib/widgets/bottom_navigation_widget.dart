@@ -14,6 +14,16 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
     setState(() {
       selectedIndex = index;
     });
+
+    /// Snackbar for features not implemented
+    if (index != 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Coming soon"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   Widget buildIcon(int index, IconData filled, IconData outline) {
@@ -29,11 +39,11 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
             offset: const Offset(0, -10),
             child: Center(
               child: SizedBox(
-                width: isSelected ? 34 : 30, // width change
+                width: isSelected ? 34 : 30,
                 child: Icon(
                   isSelected ? filled : outline,
                   color: Colors.white,
-                  size: isSelected ? 30 : 26, // size change
+                  size: isSelected ? 30 : 26,
                 ),
               ),
             ),
@@ -53,20 +63,29 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
           /// HOME
           buildIcon(0, Icons.home, Icons.home_outlined),
 
+          /// REELS
+          buildIcon(3, Icons.video_library, Icons.video_library_outlined),
+          /// CREATE
+          buildIcon(2, Icons.add_box, Icons.add_box_outlined),
           /// SEARCH
           buildIcon(1, Icons.search, Icons.search_outlined),
 
-          /// CREATE
-          buildIcon(2, Icons.add_box, Icons.add_box_outlined),
-
-          /// REELS
-          buildIcon(3, Icons.video_library, Icons.video_library_outlined),
+          
 
           /// PROFILE
           Expanded(
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
-              onTap: () => onTapItem(4),
+              onTap: () {
+                onTapItem(4);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Coming soon"),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
               child: SizedBox(
                 height: 40,
                 child: Transform.translate(
@@ -83,8 +102,6 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                           width: 2,
                         ),
                       ),
-
-                      /// PROFILE IMAGE
                       child: Container(
                         height: 26,
                         width: 26,
@@ -92,7 +109,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.grey,
-                            width: 0.6, // hairline border
+                            width: 0.6,
                           ),
                           image: const DecorationImage(
                             image: NetworkImage(

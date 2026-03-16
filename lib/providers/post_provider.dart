@@ -9,9 +9,11 @@ class PostProvider extends ChangeNotifier {
   List<Post> posts = [];
 
   bool isLoading = false;
+  bool isInitialLoading = true;
 
   int page = 0;
 
+  /// FIRST LOAD
   Future<void> loadPosts() async {
 
     if (isLoading) return;
@@ -26,31 +28,21 @@ class PostProvider extends ChangeNotifier {
     page++;
 
     isLoading = false;
+    isInitialLoading = false;
 
     notifyListeners();
   }
 
+  /// REFRESH
   Future<void> refreshPosts() async {
 
     posts.clear();
     page = 0;
 
+    isInitialLoading = true;
+
     notifyListeners();
 
     await loadPosts();
-  }
-
-  void toggleLike(Post post) {
-
-    post.isLiked = !post.isLiked;
-
-    notifyListeners();
-  }
-
-  void toggleSave(Post post) {
-
-    post.isSaved = !post.isSaved;
-
-    notifyListeners();
   }
 }

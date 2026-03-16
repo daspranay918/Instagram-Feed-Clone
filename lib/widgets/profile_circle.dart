@@ -18,7 +18,7 @@ class ProfileCircle extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: Colors.white,
+          color: Colors.grey,
           width: 0.6, // hairline border
         ),
         image: DecorationImage(
