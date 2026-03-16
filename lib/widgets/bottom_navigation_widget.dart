@@ -62,7 +62,6 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
         children: [
           /// HOME
           buildIcon(0, Icons.home, Icons.home_outlined),
-
           /// REELS
           buildIcon(3, Icons.video_library, Icons.video_library_outlined),
           /// CREATE
