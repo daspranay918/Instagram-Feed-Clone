@@ -141,7 +141,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
     return Positioned(
       /// MOVED UP (was 80)
-      top: 0,
+      top: 105,
 
       left: MediaQuery.of(context).size.width / 2 - 90,
 
@@ -216,8 +216,6 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                   floating: true,
                   snap: true,
                   elevation: 0,
-                  backgroundColor: Colors.black,
-
                   leading: IconButton(
                     icon: const Icon(Icons.add, size: 32),
                     onPressed: showComingSoon,
@@ -267,6 +265,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                           child: ListView(
                             scrollDirection: Axis.horizontal,
                             children: const [
+                              SizedBox(width: 10),
                               YourStoryWidget(
                                 imageUrl: "https://i.pravatar.cc/150?img=1",
                               ),
