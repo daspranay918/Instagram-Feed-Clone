@@ -11,7 +11,6 @@ class _PostActionsState extends State<PostActions>
     with SingleTickerProviderStateMixin {
   bool isLiked = false;
   bool isSaved = false;
-  bool isReposted = false;
 
   late AnimationController likeController;
   late Animation<double> likeAnimation;

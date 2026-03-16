@@ -200,8 +200,6 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<PostProvider>();
-
     return Scaffold(
       body: Stack(
         children: [

@@ -6,16 +6,11 @@ class Post {
   final String caption;
   final double aspectRatio;
 
-  bool isLiked;
-  bool isSaved;
-
   Post({
     required this.username,
     required this.userAvatar,
     required this.images,
     required this.caption,
     required this.aspectRatio,
-    this.isLiked = false,
-    this.isSaved = false,
   });
 }
